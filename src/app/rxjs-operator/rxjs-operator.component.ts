@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { from, Observable, of, fromEvent, interval, pipe, debounce, debounceTime, take } from 'rxjs';
+import { from, Observable, of, fromEvent, interval, pipe, debounce, debounceTime, take, filter } from 'rxjs';
 
 @Component({
   selector: 'app-rxjs-operator',
@@ -8,7 +8,8 @@ import { from, Observable, of, fromEvent, interval, pipe, debounce, debounceTime
   styleUrls: ['./rxjs-operator.component.css']
 })
 export class RxjsOperatorComponent implements OnInit {
-  searchForm!:FormGroup;
+
+  searchForm!: FormGroup;
 
   //of
   /* of operator is use to make observables from a string ,array or an obj */
@@ -33,26 +34,29 @@ export class RxjsOperatorComponent implements OnInit {
   store: Observable<string> = from(['grocery', 'vegetable', 'fruits']);
 
 
+  //filter
+  name = 'salman'
+
   //fromEvent
 
   @ViewChild('valiadte') validate!: ElementRef;
 
-  constructor(private formBuilder:FormBuilder) { }
+  constructor(private formBuilder: FormBuilder) { }
   ngOnInit(): void {
 
-this.searchForm=new FormGroup({
-  name:new FormControl('start search')
-})
-
-this.searchForm.get('name')?.valueChanges
-    .pipe(
-      take(2),// take 2 values
-      debounceTime(3000)// time lag before it emits next value
-
-    ).subscribe(data=>{
-      console.log(data);
-      
+    this.searchForm = new FormGroup({
+      name: new FormControl('start search')
     })
+
+    this.searchForm.get('name')?.valueChanges
+      .pipe(
+        take(2),// take 2 values
+        debounceTime(3000)// time lag before it emits next value
+
+      ).subscribe(data => {
+        console.log(data);
+
+      })
 
     //of
     this.usersArr.subscribe(data => {
@@ -83,17 +87,30 @@ this.searchForm.get('name')?.valueChanges
 
       })
 
-      interval$.subscribe(num=>{
-        if(num<8){
-          console.log('kkkkk');  
+      interval$.subscribe(num => {
+        if (num < 8) {
+          console.log('kkkkk');
         }
       })
 
     })
 
+    //filter
+    this.searchForm.get('name')?.valueChanges.pipe(
+      filter((v) => this.checkCharCount(v))
+    ).subscribe(data => {
+      console.log(data);
+
+    })
+
+
 
   }
 
+  //filter
+  checkCharCount(v: string) {
+    return v.length < 7 ? true : false
+  }
   //fromEVent
   rxjsEventObser() {
     let btnObsrv = fromEvent(this.validate?.nativeElement, 'mouseover');
@@ -105,8 +122,8 @@ this.searchForm.get('name')?.valueChanges
   }
 
   //debounce time
-  readValues(){
-    
+  readValues() {
+
   }
 
 }
